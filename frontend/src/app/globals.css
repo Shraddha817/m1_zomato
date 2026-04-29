@@ -17,7 +17,7 @@
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
     color: #111827;
-    background-color: #f9fafb;
+    background-color: #f8f9fa;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -29,12 +29,12 @@
   }
   
   a:focus {
-    outline: 2px solid #dc2626;
+    outline: 2px solid #e23744;
     outline-offset: 2px;
   }
   
   a:hover {
-    color: #dc2626;
+    color: #e23744;
   }
   
   button {
@@ -51,7 +51,7 @@
   }
   
   button:focus {
-    outline: 2px solid #dc2626;
+    outline: 2px solid #e23744;
     outline-offset: 2px;
   }
   
@@ -72,8 +72,8 @@
   
   input:focus, select:focus, textarea:focus {
     outline: none;
-    border-color: #dc2626;
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    border-color: #e23744;
+    box-shadow: 0 0 0 3px rgba(226, 55, 68, 0.1);
   }
   
   img {
@@ -92,64 +92,78 @@
 }
 
 @layer components {
-  .card {
-    @apply bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200;
+  .zomato-header {
+    background-color: white;
+    border-bottom: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
   }
   
-  .btn {
-    @apply px-4 py-2 rounded-md font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  .zomato-logo {
+    font-size: 32px;
+    font-weight: bold;
+    color: #e23744;
+    margin: 0;
+    letter-spacing: -1px;
   }
   
-  .btn-primary {
-    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  .zomato-card {
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: relative;
   }
   
-  .btn-secondary {
-    @apply bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500;
+  .zomato-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   }
   
-  .btn-outline {
-    @apply border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500;
+  .zomato-rating-badge {
+    background-color: #48c479;
+    color: white;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 2px;
   }
   
-  .skeleton {
-    @apply animate-pulse bg-gray-200 rounded;
+  .zomato-promoted-badge {
+    background-color: #16a34a;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
   }
   
-  .loading-spinner {
-    @apply animate-spin rounded-full border-2 border-gray-200 border-t-red-600;
+  .zomato-filter-section {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 24px;
   }
   
-  .filter-checkbox {
-    @apply w-4 h-4 text-red-600 rounded focus:ring-red-500 focus:ring-2;
+  .zomato-button {
+    background-color: #e23744;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
   }
   
-  .filter-radio {
-    @apply w-4 h-4 text-red-600 focus:ring-red-500 focus:ring-2;
-  }
-  
-  .restaurant-card {
-    @apply bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer;
-  }
-  
-  .restaurant-image {
-    @apply w-full h-48 object-cover;
-  }
-  
-  .promoted-badge {
-    @apply absolute top-2 left-2 bg-green-600 text-white px-2 py-1 rounded text-xs font-medium;
-  }
-  
-  .rating-stars {
-    @apply flex items-center;
-  }
-  
-  .star-filled {
-    @apply w-4 h-4 fill-yellow-400 text-yellow-400;
-  }
-  
-  .star-empty {
-    @apply w-4 h-4 text-gray-300;
+  .zomato-button:hover {
+    background-color: #c41e3a;
   }
 }
 
@@ -168,7 +182,9 @@
   }
   
   .container-custom {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
   }
   
   .text-shadow {
@@ -176,23 +192,17 @@
   }
   
   .hover-lift {
-    @apply transition-transform duration-200 hover:scale-105;
+    transition: transform 0.2s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
   }
   
   .responsive-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
-  }
-  
-  .responsive-grid-2 {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
-  }
-  
-  .mobile-only {
-    @apply block sm:hidden;
-  }
-  
-  .desktop-only {
-    @apply hidden sm:block;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
   }
   
   .truncate-2 {

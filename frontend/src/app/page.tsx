@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Filter, Star, Clock, MapPin, User, ShoppingCart, ChevronDown } from 'lucide-react'
+import { Search, Filter, Star, Clock, MapPin, User, ShoppingCart, ChevronDown, Heart } from 'lucide-react'
 
 interface Restaurant {
   id: string
@@ -214,27 +214,6 @@ export default function HomePage() {
     }).format(amount)
   }
 
-  const renderStars = (rating: number | null) => {
-    if (!rating) return <span className="text-gray-400">No rating</span>
-    
-    const fullStars = Math.floor(rating)
-    const hasHalfStar = rating % 1 >= 0.5
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
-    
-    return (
-      <div className="flex items-center">
-        {[...Array(fullStars)].map((_, i) => (
-          <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-        ))}
-        {hasHalfStar && <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />}
-        {[...Array(emptyStars)].map((_, i) => (
-          <Star key={i} className="w-4 h-4 text-gray-300" />
-        ))}
-        <span className="ml-1 text-sm text-gray-600">{rating.toFixed(1)}</span>
-      </div>
-    )
-  }
-
   const cuisineOptions = [
     'American', 'Andhra', 'Arabian', 'Asian', 'BBQ', 'Bakery', 'Bengali', 'Beverages',
     'Biryani', 'Burger', 'Cafe', 'Chinese', 'Continental', 'Desserts', 'European',
@@ -257,33 +236,33 @@ export default function HomePage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
       {/* Header */}
-      <header style={{ backgroundColor: 'white', borderBottom: '1px solid #e9ecef', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+      <header style={{ backgroundColor: 'white', borderBottom: '1px solid #e9ecef', boxShadow: '0 2px 4px rgba(0,0,0,0.08)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '80px' }}>
             {/* Logo */}
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#e23744', margin: 0 }}>FoodieFind</h1>
+              <h1 style={{ fontSize: '32px', fontWeight: 'bold', color: '#e23744', margin: 0, letterSpacing: '-1px' }}>Zomato</h1>
             </div>
 
-            {/* Location Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #dee2e6', borderRadius: '8px', padding: '8px 12px' }}>
-              <MapPin style={{ width: '16px', height: '16px', color: '#e23744', marginRight: '8px' }} />
-              <select 
-                value={selectedLocation}
-                onChange={(e) => setSelectedLocation(e.target.value)}
-                style={{ border: 'none', outline: 'none', fontSize: '14px', fontWeight: '500', background: 'transparent' }}
-              >
-                {locations.map(location => (
-                  <option key={location} value={location}>{location}</option>
-                ))}
-              </select>
-              <ChevronDown style={{ width: '16px', height: '16px', color: '#6c757d', marginLeft: '8px' }} />
-            </div>
+            <div style={{ display: 'flex', alignItems: 'center', flex: 1, maxWidth: '800px', margin: '0 40px' }}>
+              {/* Location Selector */}
+              <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #dee2e6', borderRadius: '8px', padding: '12px 16px', marginRight: '16px', backgroundColor: 'white', minWidth: '180px' }}>
+                <MapPin style={{ width: '18px', height: '18px', color: '#e23744', marginRight: '8px' }} />
+                <select 
+                  value={selectedLocation}
+                  onChange={(e) => setSelectedLocation(e.target.value)}
+                  style={{ border: 'none', outline: 'none', fontSize: '15px', fontWeight: '500', background: 'transparent', minWidth: '120px', cursor: 'pointer' }}
+                >
+                  {locations.map(location => (
+                    <option key={location} value={location}>{location}</option>
+                  ))}
+                </select>
+                <ChevronDown style={{ width: '16px', height: '16px', color: '#6c757d', marginLeft: '8px' }} />
+              </div>
 
-            {/* Search Bar */}
-            <div style={{ flex: 1, maxWidth: '480px', margin: '0 32px' }}>
-              <div style={{ position: 'relative' }}>
-                <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#6c757d', width: '20px', height: '20px' }} />
+              {/* Search Bar */}
+              <div style={{ flex: 1, position: 'relative' }}>
+                <Search style={{ position: 'absolute', left: '18px', top: '50%', transform: 'translateY(-50%)', color: '#6c757d', width: '20px', height: '20px' }} />
                 <input
                   type="text"
                   value={searchQuery}
@@ -291,21 +270,22 @@ export default function HomePage() {
                   placeholder="Search for restaurant, cuisine or a dish"
                   style={{
                     width: '100%',
-                    paddingLeft: '44px',
+                    paddingLeft: '52px',
                     paddingRight: '16px',
-                    padding: '8px 0',
+                    padding: '14px 0',
                     border: '1px solid #dee2e6',
                     borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none'
+                    fontSize: '15px',
+                    outline: 'none',
+                    backgroundColor: '#f8f9fa'
                   }}
                 />
               </div>
             </div>
 
             {/* Right Side Actions */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <button style={{ display: 'flex', alignItems: 'center', color: '#495057', fontSize: '14px', fontWeight: '500', background: 'none', border: 'none', cursor: 'pointer' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+              <button style={{ display: 'flex', alignItems: 'center', color: '#495057', fontSize: '15px', fontWeight: '500', background: 'none', border: 'none', cursor: 'pointer' }}>
                 <span style={{ marginRight: '4px' }}>Log in</span>
                 <span style={{ color: '#6c757d' }}>/</span>
                 <span style={{ marginLeft: '4px' }}>Sign up</span>
@@ -322,27 +302,27 @@ export default function HomePage() {
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 20px' }}>
         <div style={{ display: 'flex', gap: '24px' }}>
           {/* Sidebar Filters */}
-          <aside style={{ width: '256px', flexShrink: 0 }}>
-            <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', padding: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>Filters</h3>
+          <aside style={{ width: '280px', flexShrink: 0 }}>
+            <div style={{ backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', padding: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '20px', fontWeight: '600', margin: 0, color: '#212529' }}>Filters</h3>
                 <button 
                   onClick={clearFilters}
-                  style={{ color: '#e23744', fontSize: '14px', background: 'none', border: 'none', cursor: 'pointer' }}
+                  style={{ color: '#e23744', fontSize: '14px', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '500' }}
                 >
                   Clear all
                 </button>
               </div>
 
               {/* Cuisines Filter */}
-              <div style={{ marginBottom: '24px' }}>
-                <h4 style={{ fontSize: '16px', fontWeight: '500', marginBottom: '12px' }}>Cuisines</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '192px', overflowY: 'auto' }}>
+              <div style={{ marginBottom: '32px' }}>
+                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', color: '#212529' }}>Cuisines</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '240px', overflowY: 'auto' }}>
                   {cuisineOptions.slice(0, 10).map(cuisine => (
-                    <label key={cuisine} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                    <label key={cuisine} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '6px 0' }}>
                       <input
                         type="checkbox"
-                        style={{ marginRight: '8px' }}
+                        style={{ marginRight: '12px', width: '16px', height: '16px', cursor: 'pointer' }}
                         checked={selectedFilters.cuisines.includes(cuisine)}
                         onChange={(e) => {
                           if (e.target.checked) {
@@ -358,35 +338,35 @@ export default function HomePage() {
                           }
                         }}
                       />
-                      <span style={{ fontSize: '14px' }}>{cuisine}</span>
+                      <span style={{ fontSize: '14px', color: '#495057' }}>{cuisine}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
               {/* Rating Filter */}
-              <div style={{ marginBottom: '24px' }}>
-                <h4 style={{ fontSize: '16px', fontWeight: '500', marginBottom: '12px' }}>Rating</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ marginBottom: '32px' }}>
+                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', color: '#212529' }}>Rating</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {[4.0, 3.5, 3.0].map(rating => (
-                    <label key={rating} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                    <label key={rating} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '6px 0' }}>
                       <input
                         type="radio"
                         name="rating"
-                        style={{ marginRight: '8px' }}
+                        style={{ marginRight: '12px', width: '16px', height: '16px', cursor: 'pointer' }}
                         checked={selectedFilters.rating === rating.toString()}
                         onChange={() => setSelectedFilters(prev => ({ ...prev, rating: rating.toString() }))}
                       />
                       <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <span style={{ fontSize: '14px', marginRight: '8px' }}>{rating}+</span>
+                        <span style={{ fontSize: '14px', marginRight: '10px', color: '#495057' }}>{rating}+</span>
                         <div style={{ display: 'flex' }}>
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
                               style={{
-                                width: '12px',
-                                height: '12px',
-                                color: i < rating ? '#fbbf24' : '#d1d5db'
+                                width: '14px',
+                                height: '14px',
+                                color: i < rating ? '#48c479' : '#e5e7eb'
                               }}
                               fill={i < rating ? 'currentColor' : 'none'}
                             />
@@ -399,23 +379,23 @@ export default function HomePage() {
               </div>
 
               {/* Cost Filter */}
-              <div style={{ marginBottom: '24px' }}>
-                <h4 style={{ fontSize: '16px', fontWeight: '500', marginBottom: '12px' }}>Cost for two</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ marginBottom: '32px' }}>
+                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', color: '#212529' }}>Cost for two</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {[
                     { label: 'Less than Rs.300', value: 'low' },
                     { label: 'Rs.300 to Rs.700', value: 'medium' },
                     { label: 'More than Rs.700', value: 'high' }
                   ].map(cost => (
-                    <label key={cost.value} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                    <label key={cost.value} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '6px 0' }}>
                       <input
                         type="radio"
                         name="cost"
-                        style={{ marginRight: '8px' }}
+                        style={{ marginRight: '12px', width: '16px', height: '16px', cursor: 'pointer' }}
                         checked={selectedFilters.cost === cost.value}
                         onChange={() => setSelectedFilters(prev => ({ ...prev, cost: cost.value }))}
                       />
-                      <span style={{ fontSize: '14px' }}>{cost.label}</span>
+                      <span style={{ fontSize: '14px', color: '#495057' }}>{cost.label}</span>
                     </label>
                   ))}
                 </div>
@@ -423,11 +403,20 @@ export default function HomePage() {
 
               {/* Sort Filter */}
               <div style={{ marginBottom: '24px' }}>
-                <h4 style={{ fontSize: '16px', fontWeight: '500', marginBottom: '12px' }}>Sort by</h4>
+                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', color: '#212529' }}>Sort by</h4>
                 <select 
                   value={selectedFilters.sort}
                   onChange={(e) => setSelectedFilters(prev => ({ ...prev, sort: e.target.value }))}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #dee2e6', borderRadius: '4px', fontSize: '14px' }}
+                  style={{ 
+                    width: '100%', 
+                    padding: '12px 16px', 
+                    border: '1px solid #dee2e6', 
+                    borderRadius: '8px', 
+                    fontSize: '14px',
+                    backgroundColor: '#f8f9fa',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
                 >
                   <option value="Popularity">Popularity high to low</option>
                   <option value="Rating">Rating high to low</option>
@@ -442,14 +431,14 @@ export default function HomePage() {
           {/* Restaurant Grid */}
           <main style={{ flex: 1 }}>
             {/* Results Header */}
-            <div style={{ marginBottom: '16px' }}>
-              <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#212529', margin: '0 0 4px 0' }}>
+            <div style={{ marginBottom: '20px' }}>
+              <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#212529', margin: '0 0 6px 0' }}>
                 {selectedFilters.cuisines.length > 0 
                   ? `${selectedFilters.cuisines.join(', ')} restaurants in ${selectedLocation}`
                   : `Best restaurants in ${selectedLocation}`
                 }
               </h1>
-              <p style={{ color: '#6c757d', margin: 0, fontSize: '14px' }}>
+              <p style={{ color: '#6c757d', margin: 0, fontSize: '15px' }}>
                 {filteredRestaurants.length} restaurants
               </p>
             </div>
@@ -467,105 +456,66 @@ export default function HomePage() {
                 }}></div>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
                 {filteredRestaurants.map((restaurant) => (
-                  <div key={restaurant.id} style={{ 
-                    backgroundColor: 'white', 
-                    borderRadius: '8px', 
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                    overflow: 'hidden',
-                    cursor: 'pointer',
-                    transition: 'box-shadow 0.2s ease'
-                  }} onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)'} onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'}>
-                    {/* Restaurant Image */}
-                    <div style={{ position: 'relative', height: '192px', backgroundColor: '#f8f9fa', overflow: 'hidden' }}>
-                      <img
-                        src={`https://picsum.photos/seed/${restaurant.id}/400/300.jpg`}
-                        alt={restaurant.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                      {/* Promoted Badge */}
-                      <div style={{ 
-                        position: 'absolute', 
-                        top: '8px', 
-                        left: '8px', 
-                        backgroundColor: '#16a34a', 
-                        color: 'white', 
-                        padding: '4px 8px', 
-                        borderRadius: '4px', 
-                        fontSize: '12px', 
-                        fontWeight: '500' 
-                      }}>
-                        Promoted
+                  <div 
+                    key={restaurant.id} 
+                    style={{ 
+                      backgroundColor: 'white', 
+                      borderRadius: '8px', 
+                      padding: '20px',
+                      cursor: 'pointer',
+                      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                      border: '1px solid #e9ecef'
+                    }} 
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)'
+                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)'
+                    }} 
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    {/* Restaurant Info - Simplified */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                      <div style={{ flex: 1 }}>
+                        <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#212529', margin: '0 0 6px 0', lineHeight: '1.3' }}>
+                          {restaurant.name}
+                        </h3>
+                        
+                        <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '6px', lineHeight: '1.4' }}>
+                          {restaurant.cuisines.join(', ')}
+                        </div>
+                        
+                        <div style={{ fontSize: '14px', color: '#6c757d', display: 'flex', alignItems: 'center' }}>
+                          <MapPin style={{ width: '14px', height: '14px', marginRight: '6px' }} />
+                          {restaurant.location}
+                        </div>
                       </div>
-                      {/* Quick Actions */}
-                      <div style={{ position: 'absolute', top: '8px', right: '8px', display: 'flex', gap: '8px' }}>
-                        <button style={{ 
-                          backgroundColor: 'white', 
-                          borderRadius: '50%', 
-                          padding: '8px', 
-                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                          border: 'none',
-                          cursor: 'pointer'
+                      
+                      <div style={{ textAlign: 'right', marginLeft: '20px' }}>
+                        <div style={{
+                          backgroundColor: '#48c479',
+                          color: 'white',
+                          padding: '6px 8px',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          marginBottom: '8px'
                         }}>
-                          <svg style={{ width: '16px', height: '16px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {/* Restaurant Info */}
-                    <div style={{ padding: '16px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                        <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#212529', margin: 0 }}>{restaurant.name}</h3>
-                        <button style={{ color: '#6c757d', background: 'none', border: 'none', cursor: 'pointer' }}>
-                          <svg style={{ width: '20px', height: '20px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                          </svg>
-                        </button>
-                      </div>
-                      
-                      <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '8px' }}>
-                        {restaurant.cuisines.join(', ')}
-                      </div>
-                      
-                      <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '8px' }}>
-                        {restaurant.location}
-                      </div>
-                      
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          {renderStars(restaurant.rating)}
-                          <span style={{ marginLeft: '8px', fontSize: '14px', color: '#6c757d' }}>
-                            ({Math.floor(Math.random() * 1000) + 100} ratings)
-                          </span>
+                          <Star style={{ width: '14px', height: '14px', fill: 'currentColor' }} />
+                          {restaurant.rating?.toFixed(1) || '4.0'}
                         </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: '16px', fontWeight: '600', color: '#212529' }}>
-                            {formatCurrency(restaurant.cost * 2)}
-                          </div>
-                          <div style={{ fontSize: '12px', color: '#6c757d' }}>Cost for two</div>
+                        
+                        <div style={{ fontSize: '16px', fontWeight: '600', color: '#212529', lineHeight: '1.2' }}>
+                          {formatCurrency(restaurant.cost * 2)}
                         </div>
-                      </div>
-
-                      {/* Delivery Info */}
-                      <div style={{ 
-                        marginTop: '12px', 
-                        paddingTop: '12px', 
-                        borderTop: '1px solid #e9ecef', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'space-between', 
-                        fontSize: '14px' 
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', color: '#6c757d' }}>
-                          <Clock style={{ width: '16px', height: '16px', marginRight: '4px' }} />
-                          <span>20-30 min</span>
-                        </div>
-                        <div style={{ color: '#6c757d' }}>
-                          Free Delivery
-                        </div>
+                        <div style={{ fontSize: '12px', color: '#6c757d' }}>for two</div>
                       </div>
                     </div>
                   </div>
@@ -582,17 +532,18 @@ export default function HomePage() {
                   </svg>
                 </div>
                 <h3 style={{ fontSize: '18px', fontWeight: '500', color: '#212529', marginBottom: '8px' }}>No restaurants found</h3>
-                <p style={{ color: '#6c757d', marginBottom: '16px' }}>Try adjusting your filters or search terms</p>
+                <p style={{ color: '#6c757d', marginBottom: '16px', fontSize: '15px' }}>Try adjusting your filters or search terms</p>
                 <button
                   onClick={() => router.push('/preferences')}
                   style={{ 
-                    padding: '8px 16px', 
+                    padding: '10px 20px', 
                     backgroundColor: '#e23744', 
                     color: 'white', 
-                    borderRadius: '6px', 
+                    borderRadius: '8px', 
                     border: 'none',
                     cursor: 'pointer',
-                    fontSize: '14px'
+                    fontSize: '15px',
+                    fontWeight: '500'
                   }}
                 >
                   Get Personalized Recommendations
