@@ -77,7 +77,7 @@ def create_user_preferences(preferences: Dict[str, Any]) -> Any:
 def get_recommendations(preferences: Dict[str, Any], restaurants: List) -> List[Dict]:
     """Get recommendations using Phase 6 backend modules"""
     try:
-        # Import Phase 6 modules for production hardening
+        # Try to import Phase 6 modules for production hardening
         from milestone1.phase6_hardening.production import ProductionHardening
         from milestone1.phase6_hardening.config import ProductionConfig
         
@@ -123,11 +123,118 @@ def get_recommendations(preferences: Dict[str, Any], restaurants: List) -> List[
         return display_recommendations
         
     except ImportError as e:
-        st.warning(f"Phase 6 modules not available: {e}. Using simple filtering.")
-        return simple_filter(preferences, restaurants)
+        st.warning(f"Phase 6 modules not available: {e}. Using enhanced filtering.")
+        return enhanced_filter(preferences, restaurants)
     except Exception as e:
         st.error(f"Error getting recommendations: {e}")
-        return []
+        return simple_filter(preferences, restaurants)
+
+def enhanced_filter(preferences: Dict[str, Any], restaurants: List) -> List[Dict]:
+    """Enhanced filtering fallback when Phase 6 modules are not available"""
+    filtered_restaurants = []
+    
+    for restaurant in restaurants:
+        # Enhanced filtering logic with scoring
+        score = 0
+        match = True
+        
+        # Location filter (required)
+        if preferences.get('location') and hasattr(restaurant, 'location'):
+            if preferences['location'].lower() in str(restaurant.location).lower():
+                score += 3  # High weight for location match
+            else:
+                match = False
+        else:
+            match = False
+        
+        # Rating filter with scoring
+        if preferences.get('min_rating') and hasattr(restaurant, 'rating'):
+            try:
+                restaurant_rating = float(restaurant.rating) if restaurant.rating is not None else 0.0
+                if restaurant_rating >= preferences['min_rating']:
+                    score += (restaurant_rating - preferences['min_rating']) * 2  # Bonus for higher ratings
+                else:
+                    match = False
+            except (ValueError, TypeError):
+                pass
+        
+        # Budget band match with scoring
+        if preferences.get('budget_band') and hasattr(restaurant, 'budget_band'):
+            if str(restaurant.budget_band).lower() == preferences['budget_band'].lower():
+                score += 2
+            else:
+                match = False
+        
+        # Cuisine match with scoring
+        if preferences.get('cuisines') and hasattr(restaurant, 'cuisines'):
+            restaurant_cuisines = restaurant.cuisines if restaurant.cuisines else []
+            matching_cuisines = sum(1 for cuisine in preferences['cuisines'] if cuisine in restaurant_cuisines)
+            if matching_cuisines > 0:
+                score += matching_cuisines  # 1 point per matching cuisine
+            elif preferences['cuisines']:  # If cuisines specified but none match
+                score -= 1  # Small penalty
+        
+        # Additional preferences text matching (bonus)
+        if preferences.get('additional_preferences_text') and hasattr(restaurant, 'name'):
+            additional_text = preferences['additional_preferences_text'].lower()
+            restaurant_name = str(restaurant.name).lower()
+            if any(word in restaurant_name for word in additional_text.split() if len(word) > 2):
+                score += 1
+        
+        if match:
+            restaurant.score = score
+            filtered_restaurants.append(restaurant)
+    
+    # Sort by score (highest first) and limit to top 10
+    filtered_restaurants.sort(key=lambda x: getattr(x, 'score', 0), reverse=True)
+    
+    # Convert to display format
+    recommendations = []
+    for i, restaurant in enumerate(filtered_restaurants[:10]):
+        # Safely extract restaurant attributes
+        name = getattr(restaurant, 'name', 'Unknown')
+        location = getattr(restaurant, 'location', 'Unknown')
+        cuisines = getattr(restaurant, 'cuisines', [])
+        rating = getattr(restaurant, 'rating', 0)
+        budget_band = getattr(restaurant, 'budget_band', 'Unknown')
+        score = getattr(restaurant, 'score', 0)
+        
+        # Convert cuisines to string safely
+        cuisines_str = ', '.join(cuisines) if cuisines else 'Not specified'
+        
+        # Format rating safely
+        try:
+            rating_val = float(rating) if rating is not None else 0.0
+            rating_str = f"{rating_val:.1f}"
+        except (ValueError, TypeError):
+            rating_str = "N/A"
+        
+        # Generate explanation based on matching criteria
+        explanation_parts = []
+        if preferences.get('location') and preferences['location'].lower() in str(location).lower():
+            explanation_parts.append(f"located in {preferences['location']}")
+        if preferences.get('min_rating') and rating_val >= preferences['min_rating']:
+            explanation_parts.append(f"high rating ({rating_str})")
+        if preferences.get('budget_band') and str(budget_band).lower() == preferences['budget_band'].lower():
+            explanation_parts.append(f"matches your {preferences['budget_band']} budget")
+        if preferences.get('cuisines'):
+            matching_cuisines = [c for c in preferences['cuisines'] if c in cuisines]
+            if matching_cuisines:
+                explanation_parts.append(f"serves {', '.join(matching_cuisines)}")
+        
+        explanation = f"Recommended because it {' and '.join(explanation_parts)}" if explanation_parts else f"Good match with score {score}"
+        
+        recommendations.append({
+            'rank': i + 1,
+            'name': name,
+            'location': location,
+            'cuisines': cuisines_str,
+            'rating': rating_val if 'rating_val' in locals() else 0.0,
+            'budget_band': budget_band,
+            'explanation': explanation
+        })
+    
+    return recommendations
 
 def simple_filter(preferences: Dict[str, Any], restaurants: List) -> List[Dict]:
     """Simple filtering fallback when Phase 6 modules are not available"""
