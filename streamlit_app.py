@@ -85,10 +85,66 @@ def get_sample_restaurants():
             'cuisines': ['Tea', 'Snacks'],
             'rating': 3.8,
             'budget_band': 'low'
+        })(),
+        type('Restaurant', (), {
+            'name': 'Truffles',
+            'location': 'Bangalore',
+            'cuisines': ['Italian', 'Mediterranean'],
+            'rating': 4.3,
+            'budget_band': 'high'
+        })(),
+        type('Restaurant', (), {
+            'name': 'Mainland China',
+            'location': 'Bangalore',
+            'cuisines': ['Chinese', 'Thai'],
+            'rating': 4.1,
+            'budget_band': 'medium'
+        })(),
+        type('Restaurant', (), {
+            'name': 'Punjabi Rasoi',
+            'location': 'Delhi',
+            'cuisines': ['North Indian', 'Punjabi'],
+            'rating': 4.0,
+            'budget_band': 'low'
+        })(),
+        type('Restaurant', (), {
+            'name': 'Karim\'s',
+            'location': 'Delhi',
+            'cuisines': ['Mughlai', 'Kebab'],
+            'rating': 4.7,
+            'budget_band': 'medium'
+        })(),
+        type('Restaurant', (), {
+            'name': 'Bukhara',
+            'location': 'Delhi',
+            'cuisines': ['North Indian', 'Mughlai'],
+            'rating': 4.8,
+            'budget_band': 'high'
+        })(),
+        type('Restaurant', (), {
+            'name': 'Moti Mahal',
+            'location': 'Mumbai',
+            'cuisines': ['Multi Cuisine', 'Mughlai'],
+            'rating': 4.4,
+            'budget_band': 'medium'
+        })(),
+        type('Restaurant', (), {
+            'name': 'Cafe Leopold',
+            'location': 'Mumbai',
+            'cuisines': ['Continental', 'Cafe Food'],
+            'rating': 4.2,
+            'budget_band': 'medium'
+        })(),
+        type('Restaurant', (), {
+            'name': 'Sardar Pav Bhaji',
+            'location': 'Mumbai',
+            'cuisines': ['Street Food', 'Maharashtrian'],
+            'rating': 3.9,
+            'budget_band': 'low'
         })()
     ]
     
-    st.info("Using sample restaurant data. Set HF_DATASET_NAME in secrets for full dataset.")
+    st.info("Using sample restaurant data (15 restaurants across Bangalore, Delhi, Mumbai). Set HF_DATASET_NAME in secrets for full dataset.")
     return sample_restaurants
 
 def get_available_locations(restaurants):
@@ -187,16 +243,15 @@ def enhanced_filter(preferences: Dict[str, Any], restaurants: List) -> List[Dict
         score = 0
         match = True
         
-        # Location filter (required)
+        # Location filter (required - if specified)
         if preferences.get('location') and hasattr(restaurant, 'location'):
             if preferences['location'].lower() in str(restaurant.location).lower():
                 score += 3  # High weight for location match
             else:
                 match = False
-        else:
-            match = False
+                continue  # Skip this restaurant if location doesn't match
         
-        # Rating filter with scoring
+        # Rating filter (optional - if specified)
         if preferences.get('min_rating') and hasattr(restaurant, 'rating'):
             try:
                 restaurant_rating = float(restaurant.rating) if restaurant.rating is not None else 0.0
@@ -204,17 +259,19 @@ def enhanced_filter(preferences: Dict[str, Any], restaurants: List) -> List[Dict
                     score += (restaurant_rating - preferences['min_rating']) * 2  # Bonus for higher ratings
                 else:
                     match = False
+                    continue  # Skip this restaurant if rating is too low
             except (ValueError, TypeError):
                 pass
         
-        # Budget band match with scoring
+        # Budget band filter (optional - if specified)
         if preferences.get('budget_band') and hasattr(restaurant, 'budget_band'):
             if str(restaurant.budget_band).lower() == preferences['budget_band'].lower():
                 score += 2
             else:
                 match = False
+                continue  # Skip this restaurant if budget doesn't match
         
-        # Cuisine match with scoring
+        # Cuisine filter (optional - if specified)
         if preferences.get('cuisines') and hasattr(restaurant, 'cuisines'):
             restaurant_cuisines = restaurant.cuisines if restaurant.cuisines else []
             matching_cuisines = sum(1 for cuisine in preferences['cuisines'] if cuisine in restaurant_cuisines)
