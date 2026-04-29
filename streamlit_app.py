@@ -142,15 +142,22 @@ def simple_filter(preferences: Dict[str, Any], restaurants: List) -> List[Dict]:
                 match = False
         
         if preferences.get('min_rating') and hasattr(restaurant, 'rating'):
-            if restaurant.rating < preferences['min_rating']:
-                match = False
+            try:
+                # Convert rating to float for comparison
+                restaurant_rating = float(restaurant.rating) if restaurant.rating is not None else 0.0
+                if restaurant_rating < preferences['min_rating']:
+                    match = False
+            except (ValueError, TypeError):
+                # If rating conversion fails, skip this filter
+                pass
         
         if preferences.get('budget_band') and hasattr(restaurant, 'budget_band'):
-            if restaurant.budget_band != preferences['budget_band']:
+            if str(restaurant.budget_band).lower() != preferences['budget_band'].lower():
                 match = False
         
         if preferences.get('cuisines') and hasattr(restaurant, 'cuisines'):
-            if not any(cuisine in restaurant.cuisines for cuisine in preferences['cuisines']):
+            restaurant_cuisines = restaurant.cuisines if restaurant.cuisines else []
+            if not any(cuisine in restaurant_cuisines for cuisine in preferences['cuisines']):
                 match = False
         
         if match:
@@ -159,14 +166,31 @@ def simple_filter(preferences: Dict[str, Any], restaurants: List) -> List[Dict]:
     # Convert to display format
     recommendations = []
     for i, restaurant in enumerate(filtered_restaurants[:10]):
+        # Safely extract restaurant attributes
+        name = getattr(restaurant, 'name', 'Unknown')
+        location = getattr(restaurant, 'location', 'Unknown')
+        cuisines = getattr(restaurant, 'cuisines', [])
+        rating = getattr(restaurant, 'rating', 0)
+        budget_band = getattr(restaurant, 'budget_band', 'Unknown')
+        
+        # Convert cuisines to string safely
+        cuisines_str = ', '.join(cuisines) if cuisines else 'Not specified'
+        
+        # Format rating safely
+        try:
+            rating_val = float(rating) if rating is not None else 0.0
+            rating_str = f"{rating_val:.1f}"
+        except (ValueError, TypeError):
+            rating_str = "N/A"
+        
         recommendations.append({
             'rank': i + 1,
-            'name': getattr(restaurant, 'name', 'Unknown'),
-            'location': getattr(restaurant, 'location', 'Unknown'),
-            'cuisines': ', '.join(getattr(restaurant, 'cuisines', [])),
-            'rating': getattr(restaurant, 'rating', 0),
-            'budget_band': getattr(restaurant, 'budget_band', 'Unknown'),
-            'explanation': f"Matches your criteria with rating {getattr(restaurant, 'rating', 0)}"
+            'name': name,
+            'location': location,
+            'cuisines': cuisines_str,
+            'rating': rating_val if 'rating_val' in locals() else 0.0,
+            'budget_band': budget_band,
+            'explanation': f"Matches your criteria with rating {rating_str}"
         })
     
     return recommendations
@@ -323,15 +347,32 @@ def main():
         if restaurants:
             st.markdown("---")
             st.subheader("Sample Restaurants")
-            sample_df = pd.DataFrame([
-                {
-                    'Name': getattr(r, 'name', 'Unknown'),
-                    'Location': getattr(r, 'location', 'Unknown'),
-                    'Cuisines': ', '.join(getattr(r, 'cuisines', [])),
-                    'Rating': getattr(r, 'rating', 0)
-                }
-                for r in restaurants[:5]
-            ])
+            sample_data = []
+            for r in restaurants[:5]:
+                # Safely extract restaurant attributes
+                name = getattr(r, 'name', 'Unknown')
+                location = getattr(r, 'location', 'Unknown')
+                cuisines = getattr(r, 'cuisines', [])
+                rating = getattr(r, 'rating', 0)
+                
+                # Convert cuisines to string safely
+                cuisines_str = ', '.join(cuisines) if cuisines else 'Not specified'
+                
+                # Format rating safely
+                try:
+                    rating_val = float(rating) if rating is not None else 0.0
+                    rating_str = f"{rating_val:.1f}"
+                except (ValueError, TypeError):
+                    rating_str = "N/A"
+                
+                sample_data.append({
+                    'Name': name,
+                    'Location': location,
+                    'Cuisines': cuisines_str,
+                    'Rating': rating_str
+                })
+            
+            sample_df = pd.DataFrame(sample_data)
             st.dataframe(sample_df, use_container_width=True)
 
 if __name__ == "__main__":
