@@ -30,17 +30,66 @@ if 'restaurants_loaded' not in st.session_state:
 def load_restaurants():
     """Load restaurant data using Phase 1 ingestion"""
     try:
+        # Check if required environment variables are set
+        hf_dataset_name = os.environ.get('HF_DATASET_NAME')
+        if not hf_dataset_name:
+            st.warning("HF_DATASET_NAME environment variable not set. Using sample data.")
+            return get_sample_restaurants()
+        
         # Import Phase 1 ingestion module
         from milestone1.ingestion import load_restaurants
         restaurants = load_restaurants()
         st.session_state.restaurants_loaded = True
         return restaurants
-    except ImportError:
-        st.error("Phase 1 modules not found. Please ensure the project structure is correct.")
-        return []
+    except ImportError as e:
+        st.warning(f"Phase 1 modules not found: {e}. Using sample data.")
+        return get_sample_restaurants()
     except Exception as e:
-        st.error(f"Error loading restaurants: {e}")
-        return []
+        st.warning(f"Error loading restaurants: {e}. Using sample data.")
+        return get_sample_restaurants()
+
+def get_sample_restaurants():
+    """Provide sample restaurant data when real data is unavailable"""
+    sample_restaurants = [
+        type('Restaurant', (), {
+            'name': 'The Garden Table',
+            'location': 'Bangalore',
+            'cuisines': ['Continental', 'Italian'],
+            'rating': 4.5,
+            'budget_band': 'medium'
+        })(),
+        type('Restaurant', (), {
+            'name': 'Meghana Foods',
+            'location': 'Bangalore',
+            'cuisines': ['Andhra', 'South Indian'],
+            'rating': 4.2,
+            'budget_band': 'low'
+        })(),
+        type('Restaurant', (), {
+            'name': 'Toit',
+            'location': 'Bangalore',
+            'cuisines': ['Pub Food', 'Continental'],
+            'rating': 4.4,
+            'budget_band': 'medium'
+        })(),
+        type('Restaurant', (), {
+            'name': 'UB City',
+            'location': 'Bangalore',
+            'cuisines': ['Multi Cuisine'],
+            'rating': 4.6,
+            'budget_band': 'high'
+        })(),
+        type('Restaurant', (), {
+            'name': 'Chai Point',
+            'location': 'Bangalore',
+            'cuisines': ['Tea', 'Snacks'],
+            'rating': 3.8,
+            'budget_band': 'low'
+        })()
+    ]
+    
+    st.info("Using sample restaurant data. Set HF_DATASET_NAME in secrets for full dataset.")
+    return sample_restaurants
 
 def get_available_locations(restaurants):
     """Extract unique locations from restaurant data"""
